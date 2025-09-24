@@ -17,7 +17,7 @@ const LANG_DISPLAY_NAME: Record<string, string> = {
 export async function POST(req: NextRequest) {
   try {
     if (!GEMINI_API_KEY || !genAI) {
-      return NextResponse.json({ error: 'Gemini API key missing on server' }, { status: 500 });
+      return NextResponse.json({ error: 'Gemini API key missing on server' }, { status: 500, headers: { 'Cache-Control': 'no-store' } });
     }
     const { headline, lang } = await req.json();
     if (!headline || typeof headline !== 'string') {
@@ -36,8 +36,13 @@ export async function POST(req: NextRequest) {
       .filter(Boolean)
       .slice(0, 3);
     const haiku = lines.join('\n');
-    return NextResponse.json({ haiku, lang: langCode });
+    return NextResponse.json({ haiku, lang: langCode }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (err) {
-    return NextResponse.json({ error: 'Failed to generate haiku' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to generate haiku' }, { status: 500, headers: { 'Cache-Control': 'no-store' } });
   }
 }
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+export const runtime = 'nodejs';

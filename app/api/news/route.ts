@@ -153,6 +153,11 @@ export async function GET(req: NextRequest) {
     }
   }
   collected = dedupeByTitle(collected).slice(0, 14);
+  const headers = {
+    'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+    'Pragma': 'no-cache',
+    'Expires': '0',
+  } as Record<string, string>;
   if (!collected.length) {
     return NextResponse.json({
       headlines: [
@@ -163,7 +168,13 @@ export async function GET(req: NextRequest) {
         { title: 'Breakthrough in recycling rare-earth magnets', source: 'Sample', url: '#' },
         { title: 'Open-source community ships major release', source: 'Sample', url: '#' },
       ]
-    }, { status: 200 });
+    }, { status: 200, headers });
   }
-  return NextResponse.json({ headlines: collected, country, category }, { status: 200 });
+  return NextResponse.json({ headlines: collected, country, category }, { status: 200, headers });
 }
+
+// Force dynamic rendering and disable caching on Vercel/Next.js
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const fetchCache = 'force-no-store';
+export const runtime = 'nodejs';
