@@ -1,0 +1,27 @@
+{
+  "name": "inhaiku.lt",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Nokia-vibe news-to-haiku app (Next.js + TypeScript)",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.16.0",
+    "fast-xml-parser": "^4.4.1",
+    "next": "^14.2.13",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "typescript": "^5.6.3",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^14.2.13"
+  }
+}

@@ -1,0 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+/* Keep it minimal: public/css/styles.css contains most styles */
+html, body { height: 100%; }
+* { box-sizing: border-box; }
+
