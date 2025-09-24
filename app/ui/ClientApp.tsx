@@ -89,6 +89,7 @@ export default function ClientApp() {
   const [haikuLang, setHaikuLang] = useLocalStorage<string>('nh.lang', 'auto');
   const [headlines, setHeadlines] = useState<Headline[]>([]);
   const [lastFetchedAt, setLastFetchedAt] = useState<number>(0);
+  const [lastFetchedKey, setLastFetchedKey] = useState<string>('');
   const [current, setCurrent] = useState<Headline | null>(null);
   const [currentHaiku, setCurrentHaiku] = useState<string>('');
   const [history, setHistory] = useLocalStorage<HaikuEntry[]>('nh.history', []);
@@ -174,7 +175,7 @@ export default function ClientApp() {
 
   // Data
   const fetchNews = useCallback(async (cat: Category, ctry: string): Promise<Headline[]> => {
-    const r = await fetch(`/api/news?category=${encodeURIComponent(cat)}&country=${encodeURIComponent(ctry)}`);
+    const r = await fetch(`/api/news?category=${encodeURIComponent(cat)}&country=${encodeURIComponent(ctry)}`, { cache: 'no-store' });
     if (!r.ok) throw new Error('News fetch failed');
     const data = await r.json();
     return data.headlines || [];
@@ -187,17 +188,28 @@ export default function ClientApp() {
     return data.haiku as string;
   }, []);
 
-  const ensureHeadlines = useCallback(async () => {
+  const ensureHeadlines = useCallback(async (
+    catOverride?: Category,
+    countryOverride?: string
+  ): Promise<Headline[]> => {
     const freshForMs = 1000 * 60 * 10; // 10 min
-    if (headlines.length && (Date.now() - lastFetchedAt < freshForMs)) return;
+    const catUse = catOverride ?? category;
+    const countryUse = countryOverride ?? country;
+    const key = `${catUse}|${countryUse}`;
+    const isFresh = headlines.length && (Date.now() - lastFetchedAt < freshForMs) && lastFetchedKey === key;
+    // If we have fresh headlines for the same key, return them.
+    if (isFresh) return headlines;
     try {
-      const list = await fetchNews(category, country);
+      const list = await fetchNews(catUse, countryUse);
       setHeadlines(list);
       setLastFetchedAt(Date.now());
+      setLastFetchedKey(key);
+      return list;
     } catch (e) {
-      // toast handled by caller if needed
+      // Return current state (may be empty) on failure; caller decides how to handle.
+      return headlines;
     }
-  }, [category, country, fetchNews, headlines.length, lastFetchedAt]);
+  }, [category, country, fetchNews, headlines, lastFetchedAt, lastFetchedKey]);
 
   const [headlineOut, setHeadlineOut] = useState<string>('Tap Generate...');
   const [haikuOut, setHaikuOut] = useState<string>('...and turn a headline\ninto a 3-line poem');
@@ -236,13 +248,14 @@ export default function ClientApp() {
       setSkeleton(true);
       setHeadlineOut('');
       setHaikuOut('');
-      await ensureHeadlines();
-      if (!headlines.length) {
+      const list = await ensureHeadlines();
+      const pool = (list && list.length) ? list : headlines;
+      if (!pool.length) {
         setHeadlineOut('No headlines right now. Try again.');
         setHaikuOut('');
         return;
       }
-      const item = headlines[Math.floor(Math.random() * headlines.length)];
+      const item = pool[Math.floor(Math.random() * pool.length)];
       setCurrent(item);
       setIndicator(renderIndicator());
       await typeText(setHeadlineOut, item.title, 15);
@@ -360,7 +373,7 @@ export default function ClientApp() {
                 const val = e.target.value;
                 setCountry(val);
                 setHeadlines([]); setLastFetchedAt(0);
-                await ensureHeadlines();
+                await ensureHeadlines(category, val);
                 const nm = COUNTRIES.find(([c]) => c === val)?.[1] || val;
                 toast(`Country: ${nm}`);
               }}>
@@ -388,7 +401,7 @@ export default function ClientApp() {
                 if (typing) return;
                 setCategory(c.val);
                 setHeadlines([]); setLastFetchedAt(0);
-                await ensureHeadlines();
+                await ensureHeadlines(c.val, country);
                 toast(`Category: ${c.label}`);
               }}>{c.label}</span>
             ))}
