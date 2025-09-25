@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       .slice(0, 3);
     const haiku = lines.join('\n');
     return NextResponse.json({ haiku, lang: langCode }, { headers: { 'Cache-Control': 'no-store' } });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Failed to generate haiku' }, { status: 500, headers: { 'Cache-Control': 'no-store' } });
   }
 }

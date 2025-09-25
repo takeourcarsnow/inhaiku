@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-page-custom-font, @next/next/no-css-tags */
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
 
