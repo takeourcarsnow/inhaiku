@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import type { HaikuEntry, Headline } from '../lib/utils';
+import type { HaikuEntry, Headline, Category } from '../lib/utils';
 import { fetchHaiku } from '../services/api';
 
 export function useNewHaiku({ ensureHeadlines, headlines, typeText, setHeadlineOut, setHaikuOut, setIndicator, renderIndicator, setSkeleton, setCurrent, setCurrentHaiku, setFavActive, isFavorited, pushHistory, haikuLang, country, category }: {
@@ -48,7 +48,7 @@ export function useNewHaiku({ ensureHeadlines, headlines, typeText, setHeadlineO
         haiku: poem,
         createdAt: new Date().toISOString(),
         country,
-        category: category as Cat,
+        category: category as Category,
         haikuLang: langToUse
       };
       setFavActive(isFavorited(entry));
