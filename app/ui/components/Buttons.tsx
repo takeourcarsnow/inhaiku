@@ -4,6 +4,8 @@ import React, { Dispatch, SetStateAction } from 'react';
 
 type Props = {
   newHaiku: () => void;
+  isOnCooldown: boolean;
+  remainingTime: number;
   setTheme: Dispatch<SetStateAction<'dark' | 'light'>>;
   openFavorites: () => void;
   openHistory: () => void;
@@ -14,10 +16,10 @@ type Props = {
   toggleFavoriteCurrent: () => void;
 };
 
-export default function Buttons({ newHaiku, setTheme, openFavorites, openHistory, copyCurrent, shareTwitter, shareFacebook, favActive, toggleFavoriteCurrent }: Props) {
+export default function Buttons({ newHaiku, isOnCooldown, remainingTime, setTheme, openFavorites, openHistory, copyCurrent, shareTwitter, shareFacebook, favActive, toggleFavoriteCurrent }: Props) {
   return (
     <div className="button-container">
-      <button data-action="new-haiku" className="main-button" onClick={() => newHaiku()}>🌺 Generate</button>
+      <button data-action="new-haiku" className="main-button" onClick={() => newHaiku()} disabled={isOnCooldown}>🌺 {isOnCooldown ? `Generate (${remainingTime}s)` : 'Generate'}</button>
 
       <div className="social-buttons">
   <button data-action="toggle-theme" className="social-button theme" onClick={() => setTheme((t) => t === 'dark' ? 'light' : 'dark')}>🌓 Theme</button>

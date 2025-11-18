@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import type { HaikuEntry, Headline, Category } from '../lib/utils';
 import { fetchHaiku } from '../services/api';
 
@@ -20,7 +20,34 @@ export function useNewHaiku({ ensureHeadlines, headlines, typeText, setHeadlineO
   country: string;
   category: string;
 }) {
+  const lastCalledRef = useRef<number>(0);
+  const [isOnCooldown, setIsOnCooldown] = useState<boolean>(false);
+  const [remainingTime, setRemainingTime] = useState<number>(0);
+
+  useEffect(() => {
+    if (!isOnCooldown) return;
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const elapsed = now - lastCalledRef.current;
+      const remaining = Math.max(0, 15000 - elapsed);
+      setRemainingTime(Math.ceil(remaining / 1000));
+      if (remaining <= 0) {
+        setIsOnCooldown(false);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isOnCooldown]);
+
   const newHaiku = useCallback(async () => {
+    const now = Date.now();
+    if (now - lastCalledRef.current < 15000) {
+      // Cooldown active, do nothing
+      return;
+    }
+    lastCalledRef.current = now;
+    setIsOnCooldown(true);
+    setRemainingTime(15);
+
     setIndicator(renderIndicator());
     try {
       setSkeleton(true);
@@ -60,7 +87,7 @@ export function useNewHaiku({ ensureHeadlines, headlines, typeText, setHeadlineO
     }
   }, [ensureHeadlines, headlines, typeText, setHeadlineOut, setHaikuOut, setIndicator, renderIndicator, setSkeleton, setCurrent, setCurrentHaiku, setFavActive, isFavorited, pushHistory, haikuLang, country, category]);
 
-  return { newHaiku } as const;
+  return { newHaiku, isOnCooldown, remainingTime } as const;
 }
 
 export default useNewHaiku;

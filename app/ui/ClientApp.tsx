@@ -41,6 +41,8 @@ export default function ClientApp() {
     historyOpen,
     favoritesOpen,
     newHaiku,
+    isOnCooldown,
+    remainingTime,
     openHistory,
     openFavorites,
     closeModals,
@@ -81,6 +83,8 @@ export default function ClientApp() {
 
         <Buttons
           newHaiku={newHaiku}
+          isOnCooldown={isOnCooldown}
+          remainingTime={remainingTime}
           setTheme={setTheme}
           openFavorites={openFavorites}
           openHistory={openHistory}

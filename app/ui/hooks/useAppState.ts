@@ -63,6 +63,8 @@ export interface AppState {
   historyOpen: boolean;
   favoritesOpen: boolean;
   newHaiku: () => void;
+  isOnCooldown: boolean;
+  remainingTime: number;
   openHistory: () => void;
   openFavorites: () => void;
   closeModals: () => void;
@@ -153,7 +155,7 @@ export function useAppState(): AppState {
     toast(nowFavorited ? 'Added to favorites' : 'Removed from favorites');
   };
 
-  const { newHaiku } = useNewHaiku({ ensureHeadlines: ensureHeadlinesAdapter, headlines, typeText, setHeadlineOut, setHaikuOut, setIndicator: (() => refreshIndicator()) as any, renderIndicator, setSkeleton, setCurrent, setCurrentHaiku, setFavActive, isFavorited, pushHistory, haikuLang, country, category });
+  const { newHaiku, isOnCooldown, remainingTime } = useNewHaiku({ ensureHeadlines: ensureHeadlinesAdapter, headlines, typeText, setHeadlineOut, setHaikuOut, setIndicator: (() => refreshIndicator()) as any, renderIndicator, setSkeleton, setCurrent, setCurrentHaiku, setFavActive, isFavorited, pushHistory, haikuLang, country, category });
 
   const { historyOpen, favoritesOpen, openHistory, openFavorites, closeModals } = useModals(false, false);
 
@@ -200,6 +202,8 @@ export function useAppState(): AppState {
     historyOpen,
     favoritesOpen,
     newHaiku,
+    isOnCooldown,
+    remainingTime,
     openHistory,
     openFavorites,
     closeModals,
