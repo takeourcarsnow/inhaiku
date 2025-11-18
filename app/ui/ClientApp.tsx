@@ -1,6 +1,7 @@
 "use client";
 
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
+import { useState, useEffect } from 'react';
 import Controls from './components/Controls';
 import Modals from './components/Modals';
 import StatusBar from './components/StatusBar';
@@ -57,8 +58,14 @@ export default function ClientApp() {
     copyText,
   } = useAppState();
 
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    setLoaded(true);
+  }, []);
+
   return (
-    <div className="phone-container">
+    <div className={`phone-container ${loaded ? 'loaded' : ''}`}>
       <div className="screen">
         <StatusBar clock={clock} dateStr={dateStr} />
 

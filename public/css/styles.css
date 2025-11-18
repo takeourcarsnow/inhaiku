@@ -62,9 +62,12 @@ body {
   position: relative;
   transform: translateZ(0);
   will-change: transform;
-  transition: transform var(--transition-speed) ease;
+  transition: transform var(--transition-speed) ease, opacity 0.5s ease;
+  opacity: 0;
 }
-.phone-container:hover { transform: translateY(-4px) translateZ(0); }
+.phone-container.loaded {
+  opacity: 1;
+}
 
 /* Screen styles */
 .screen {
