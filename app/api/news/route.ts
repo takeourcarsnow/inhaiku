@@ -45,8 +45,10 @@ function feedsFor({ country = 'US', category = 'general', lang }: { country?: st
   const aljazeera = 'https://www.aljazeera.com/xml/rss/all.xml';
   const list = [] as { name: string; url: string }[];
   list.push({ name: `Google News ${c}`, url: google });
-  list.push({ name: 'BBC', url: bbc });
-  list.push({ name: 'The Guardian', url: guardian });
+  if (c === 'US') {
+    list.push({ name: 'BBC', url: bbc });
+    list.push({ name: 'The Guardian', url: guardian });
+  }
   list.push({ name: 'Al Jazeera', url: aljazeera });
   return list;
 }

@@ -153,7 +153,7 @@ export function useAppState(): AppState {
     toast(nowFavorited ? 'Added to favorites' : 'Removed from favorites');
   };
 
-  const { newHaiku } = useNewHaiku({ ensureHeadlines: ensureHeadlinesAdapter, headlines, typeText, setHeadlineOut, setHaikuOut, setIndicator: (() => refreshIndicator()) as any, renderIndicator, setSkeleton, setCurrent, setCurrentHaiku, setFavActive, isFavorited, pushHistory, haikuLang, country });
+  const { newHaiku } = useNewHaiku({ ensureHeadlines: ensureHeadlinesAdapter, headlines, typeText, setHeadlineOut, setHaikuOut, setIndicator: (() => refreshIndicator()) as any, renderIndicator, setSkeleton, setCurrent, setCurrentHaiku, setFavActive, isFavorited, pushHistory, haikuLang, country, category });
 
   const { historyOpen, favoritesOpen, openHistory, openFavorites, closeModals } = useModals(false, false);
 
@@ -164,8 +164,10 @@ export function useAppState(): AppState {
 
   useKeyboardShortcuts({ newHaiku, copyCurrent: copyCurrentWrapper, setTheme, closeModals, setSound });
 
-  // refresh indicator when dependencies change
-  useEffect(() => { refreshIndicator(); }, [refreshIndicator]);
+  // Refetch headlines when category or country changes
+  useEffect(() => {
+    ensureHeadlines(category, country);
+  }, [category, country, ensureHeadlines]);
 
   return {
     theme,

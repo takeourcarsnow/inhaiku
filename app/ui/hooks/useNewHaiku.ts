@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import type { HaikuEntry, Headline } from '../lib/utils';
 import { fetchHaiku } from '../services/api';
 
-export function useNewHaiku({ ensureHeadlines, headlines, typeText, setHeadlineOut, setHaikuOut, setIndicator, renderIndicator, setSkeleton, setCurrent, setCurrentHaiku, setFavActive, isFavorited, pushHistory, haikuLang, country }: {
+export function useNewHaiku({ ensureHeadlines, headlines, typeText, setHeadlineOut, setHaikuOut, setIndicator, renderIndicator, setSkeleton, setCurrent, setCurrentHaiku, setFavActive, isFavorited, pushHistory, haikuLang, country, category }: {
   ensureHeadlines: (cat?: string, country?: string, current?: Headline[]) => Promise<Headline[]>;
   headlines: Headline[];
   typeText: (setOut: (s: string) => void, text: string, speed?: number) => Promise<void>;
@@ -18,6 +18,7 @@ export function useNewHaiku({ ensureHeadlines, headlines, typeText, setHeadlineO
   pushHistory: (e: HaikuEntry) => void;
   haikuLang: string;
   country: string;
+  category: string;
 }) {
   const newHaiku = useCallback(async () => {
     setIndicator(renderIndicator());
@@ -25,7 +26,7 @@ export function useNewHaiku({ ensureHeadlines, headlines, typeText, setHeadlineO
       setSkeleton(true);
       setHeadlineOut('');
       setHaikuOut('');
-      const list = await ensureHeadlines();
+      const list = await ensureHeadlines(category, country);
       const pool = (list && list.length) ? list : headlines;
       if (!pool.length) {
         setHeadlineOut('No headlines right now. Try again.');
@@ -40,11 +41,6 @@ export function useNewHaiku({ ensureHeadlines, headlines, typeText, setHeadlineO
       const poem = await fetchHaiku(item.title, langToUse);
       setCurrentHaiku(poem);
       await typeText(setHaikuOut, poem, 24);
-  const itemRecord = item as unknown as Record<string, unknown>;
-  const maybeCategory = typeof itemRecord.category === 'string' ? itemRecord.category as string : 'general';
-  const allowedCats = ['general','business','entertainment','health','science','sports','technology'] as const;
-  type Cat = (typeof allowedCats)[number];
-  const itemCategory: Cat = (allowedCats as readonly string[]).includes(maybeCategory) ? (maybeCategory as Cat) : 'general';
       const entry: HaikuEntry = {
         title: item.title,
         source: item.source,
@@ -52,7 +48,7 @@ export function useNewHaiku({ ensureHeadlines, headlines, typeText, setHeadlineO
         haiku: poem,
         createdAt: new Date().toISOString(),
         country,
-        category: itemCategory,
+        category: category as Cat,
         haikuLang: langToUse
       };
       setFavActive(isFavorited(entry));
@@ -62,7 +58,7 @@ export function useNewHaiku({ ensureHeadlines, headlines, typeText, setHeadlineO
     } finally {
       setSkeleton(false);
     }
-  }, [ensureHeadlines, headlines, typeText, setHeadlineOut, setHaikuOut, setIndicator, renderIndicator, setSkeleton, setCurrent, setCurrentHaiku, setFavActive, isFavorited, pushHistory, haikuLang, country]);
+  }, [ensureHeadlines, headlines, typeText, setHeadlineOut, setHaikuOut, setIndicator, renderIndicator, setSkeleton, setCurrent, setCurrentHaiku, setFavActive, isFavorited, pushHistory, haikuLang, country, category]);
 
   return { newHaiku } as const;
 }
