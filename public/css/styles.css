@@ -311,6 +311,13 @@ button:focus:not(:focus-visible), a:focus:not(:focus-visible) { outline: none; }
   .item-haiku { font-size: 14px; }
 }
 
+/* Responsive scaling for non-mobile screens */
+@media (min-width: 481px) {
+  .phone-container {
+    transform: scale(0.6) translateZ(0);
+  }
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
